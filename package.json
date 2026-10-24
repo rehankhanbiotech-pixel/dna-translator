@@ -1,0 +1,7 @@
+{
+  "name": "dna-translator",
+  "version": "1.1.0",
+  "description": "DNA translator and ORF finder for biotechnology",
+  "scripts": { "test": "node --test" },
+  "license": "MIT"
+}
