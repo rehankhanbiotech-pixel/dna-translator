@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DNA Translator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef3f4;--sf:#fff;--ink:#14262b;--mu:#5b7177;--ln:#cfdcdf;--ac:#0f6b7a;--acs:#dff0f3;--A:#2e8b57;--T:#c0392b;--G:#b7791f;--C:#2b6cb0;--stop:#c0392b;--met:#2e8b57;
+--hd:"Bricolage Grotesque",system-ui,sans-serif;--mo:"JetBrains Mono",ui-monospace,Menlo,monospace;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1b1f;--sf:#16282d;--ink:#e3eef0;--mu:#8fa7ad;--ln:#264047;--ac:#5cc3d3;--acs:#1c3a41;--A:#5fcf93;--T:#ff7b6b;--G:#e8b64f;--C:#6aaef0;--stop:#ff7b6b;--met:#5fcf93;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1b1f;--sf:#16282d;--ink:#e3eef0;--mu:#8fa7ad;--ln:#264047;--ac:#5cc3d3;--acs:#1c3a41;--A:#5fcf93;--T:#ff7b6b;--G:#e8b64f;--C:#6aaef0;--stop:#ff7b6b;--met:#5fcf93;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 48px}
+h1{font:700 clamp(30px,7vw,46px)/1.05 var(--hd);margin:8px 0 6px;letter-spacing:-.02em}
+.sub{color:var(--mu);margin:0 0 20px;max-width:56ch}
+section{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:16px;margin:0 0 14px}
+h2{font:600 18px/1.2 var(--hd);margin:0 0 10px}
+textarea{width:100%;min-height:120px;resize:vertical;font:14px/1.5 var(--mo);color:var(--ink);background:var(--bg);border:1px solid var(--ln);border-radius:8px;padding:10px;letter-spacing:.04em}
+textarea:focus,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+button,select,input[type=number]{font:600 14px var(--hd);border-radius:8px;border:1px solid var(--ln);background:var(--sf);color:var(--ink);padding:8px 12px;cursor:pointer}
+input[type=number]{width:72px;font-family:var(--mo)}
+button.pri{background:var(--ac);color:var(--bg);border-color:var(--ac)}
+@media (prefers-color-scheme:light){button.pri{color:#fff}}
+.warn{color:var(--T);font-size:14px;margin-top:8px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px}
+.stat{background:var(--bg);border-radius:8px;padding:8px 10px}
+.stat b{display:block;font:600 22px var(--mo)}
+.stat span{color:var(--mu);font-size:13px}
+.seq{font:14px/1.7 var(--mo);word-break:break-all;background:var(--bg);border-radius:8px;padding:10px;max-height:180px;overflow:auto;letter-spacing:.06em}
+.lbl{color:var(--mu);font-size:13px;margin:10px 0 4px}
+.bA{color:var(--A)}.bT,.bU{color:var(--T)}.bG{color:var(--G)}.bC{color:var(--C)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tabs button[aria-pressed=true]{background:var(--acs);border-color:var(--ac);color:var(--ac)}
+.cods{display:flex;flex-wrap:wrap;gap:4px;max-height:340px;overflow:auto;padding:2px}
+.cod{border:1px solid var(--ln);border-radius:6px;padding:2px 6px;text-align:center;font-family:var(--mo);min-width:46px}
+.cod i{display:block;font-style:normal;font-size:11px;color:var(--mu)}
+.cod b{font-size:15px}
+.cod.m{border-color:var(--met)}.cod.m b{color:var(--met)}
+.cod.s{border-color:var(--stop)}.cod.s b{color:var(--stop)}
+.cod.o{background:var(--acs)}
+.prot{font:15px/1.6 var(--mo);word-break:break-all;background:var(--bg);border-radius:8px;padding:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--ln)}
+td.n{font-family:var(--mo)}
+tr.orf{cursor:pointer}tr.orf:hover{background:var(--acs)}
+.tw{overflow-x:auto}
+.bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px 14px}
+.bar{display:flex;align-items:center;gap:6px;font:13px var(--mo)}
+.bar u{display:block;height:8px;background:var(--ac);border-radius:4px;text-decoration:none}
+.bar span{min-width:30px}
+.empty{color:var(--mu)}
+</style>
+</head>
+<body>
+<main>
+<h1>DNA Translator</h1>
+<p class="sub">Paste a DNA sequence to see its mRNA, reverse complement, protein in all six reading frames, and every open reading frame.</p>
+
+<section>
+<h2>Sequence</h2>
+<textarea id="in" spellcheck="false" aria-label="DNA sequence" placeholder="Paste DNA or FASTA here. Use the coding (sense) strand, 5′ to 3′."></textarea>
+<div class="row">
+<button class="pri" id="go">Translate</button>
+<button id="ex">Load example</button>
+<button id="clr">Clear</button>
+</div>
+<div class="warn" id="warn" role="status"></div>
+</section>
+
+<div id="out" hidden>
+<section><h2>Summary</h2><div class="stats" id="stats"></div></section>
+
+<section>
+<h2>Transcription</h2>
+<div class="lbl">mRNA (coding strand, T → U)</div><div class="seq" id="mrna"></div>
+<div class="lbl">Reverse complement (5′ to 3′)</div><div class="seq" id="rc"></div>
+</section>
+
+<section>
+<h2>Translation</h2>
+<div class="tabs" id="tabs" role="group" aria-label="Reading frame"></div>
+<div class="lbl">Protein</div><div class="prot" id="prot"></div>
+<div class="row"><button id="cp">Copy protein</button><span class="empty" id="cpm"></span></div>
+<div class="lbl">Codons</div><div class="cods" id="cods"></div>
+</section>
+
+<section>
+<h2>Open reading frames</h2>
+<div class="row" style="margin:0 0 10px"><label for="min">Minimum length (amino acids)</label><input type="number" id="min" value="30" min="1" max="5000"></div>
+<div class="tw"><table><thead><tr><th>Frame</th><th>Position</th><th>Length</th></tr></thead><tbody id="orfs"></tbody></table></div>
+<p class="empty" id="orfn"></p>
+</section>
+
+<section><h2>Amino acid composition (current frame)</h2><div class="bars" id="comp"></div></section>
+</div>
+</main>
+
+<script>
+(function(){
+var B="TCAG",AAS="FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",CT={};
+for(var i=0;i<4;i++)for(var j=0;j<4;j++)for(var k=0;k<4;k++)CT[B[i]+B[j]+B[k]]=AAS[16*i+4*j+k];
+var NAME={A:"Ala",R:"Arg",N:"Asn",D:"Asp",C:"Cys",E:"Glu",Q:"Gln",G:"Gly",H:"His",I:"Ile",L:"Leu",K:"Lys",M:"Met",F:"Phe",P:"Pro",S:"Ser",T:"Thr",W:"Trp",Y:"Tyr",V:"Val","*":"Stop"};
+var EX=">example coding sequence\nGCATGGCTAAGGTTCTGACCGAAGGCATCAAATTCCTGGGTGCCCAGTAAGGATCCATGAAAACCGGTTACCTGGATTTCCGTCAATGAGCTTA";
+var $=function(id){return document.getElementById(id)};
+var seq="",frame="+1",hl=null,orfs=[];
+
+function clean(raw){
+ var t=raw.split("\n").filter(function(l){return l.trim()[0]!==">"}).join("").toUpperCase().replace(/U/g,"T");
+ var bad=t.replace(/[\s\d]/g,"").replace(/[ACGT]/g,"");
+ return {s:t.replace(/[^ACGT]/g,""),bad:bad.length};
+}
+function rc(s){var m={A:"T",T:"A",G:"C",C:"G"},o="";for(var i=s.length-1;i>=0;i--)o+=m[s[i]];return o}
+function col(s){return s.replace(/[ACGTU]/g,function(c){return '<span class="b'+c+'">'+c+'</span>'})}
+function frameSeq(f){return f[0]==="-"?rc(seq):seq}
+function translate(f){
+ var s=frameSeq(f),o=+f[1]-1,r=[];
+ for(var i=o;i+3<=s.length;i+=3){var c=s.substr(i,3);r.push({c:c,a:CT[c]})}
+ return r;
+}
+function findOrfs(min){
+ var res=[],L=seq.length;
+ ["+1","+2","+3","-1","-2","-3"].forEach(function(f){
+  var cs=translate(f),o=+f[1]-1,i=0;
+  while(i<cs.length){
+   if(cs[i].a==="M"){
+    var j=i;while(j<cs.length&&cs[j].a!=="*")j++;
+    var stopped=j<cs.length,aa=j-i,nt=(j-i+(stopped?1:0))*3,p=o+i*3;
+    if(aa>=min){
+     var from,to;
+     if(f[0]==="+"){from=p+1;to=p+nt}else{from=L-(p+nt)+1;to=L-p}
+     res.push({f:f,from:from,to:to,aa:aa,ci0:i,ci1:j-1,open:!stopped});
+    }
+    i=j+1;
+   }else i++;
+  }
+ });
+ return res.sort(function(a,b){return b.aa-a.aa});
+}
+function render(){
+ var cs=translate(frame);
+ $("tabs").innerHTML="";
+ ["+1","+2","+3","-1","-2","-3"].forEach(function(f){
+  var b=document.createElement("button");b.textContent=f;b.setAttribute("aria-pressed",f===frame);
+  b.onclick=function(){frame=f;hl=null;render()};$("tabs").appendChild(b);
+ });
+ var p=cs.map(function(x){return x.a==="M"?'<b style="color:var(--met)">M</b>':x.a==="*"?'<b style="color:var(--stop)">*</b>':x.a}).join("");
+ $("prot").innerHTML=p||'<span class="empty">Sequence too short for this frame.</span>';
+ var h="",cap=600;
+ cs.slice(0,cap).forEach(function(x,i){
+  var cl="cod"+(x.a==="M"?" m":"")+(x.a==="*"?" s":"")+(hl&&i>=hl[0]&&i<=hl[1]?" o":"");
+  h+='<div class="'+cl+'" data-i="'+i+'"><i>'+x.c+'</i><b>'+x.a+'</b></div>';
+ });
+ if(cs.length>cap)h+='<span class="empty">… '+(cs.length-cap)+' more codons (copy the protein for the full result)</span>';
+ $("cods").innerHTML=h;
+ if(hl){var el=$("cods").querySelector('[data-i="'+hl[0]+'"]');if(el)$("cods").scrollTop=el.offsetTop-$("cods").offsetTop-8}
+ // composition
+ var cnt={},tot=0;cs.forEach(function(x){if(x.a!=="*"){cnt[x.a]=(cnt[x.a]||0)+1;tot++}});
+ var ks=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a]}),mx=ks.length?cnt[ks[0]]:1;
+ $("comp").innerHTML=ks.length?ks.map(function(k){return '<div class="bar" title="'+NAME[k]+'"><span>'+k+'</span><u style="width:'+Math.max(4,cnt[k]/mx*80)+'px"></u><span>'+cnt[k]+'</span></div>'}).join(""):'<span class="empty">No amino acids in this frame.</span>';
+}
+function renderOrfs(){
+ var min=Math.max(1,parseInt($("min").value,10)||30);
+ orfs=findOrfs(min);
+ $("orfs").innerHTML=orfs.map(function(o,i){
+  return '<tr class="orf" tabindex="0" data-i="'+i+'"><td class="n">'+o.f+'</td><td class="n">'+o.from+'–'+o.to+(o.f[0]==="-"?" (reverse)":"")+'</td><td class="n">'+o.aa+' aa'+(o.open?" (no stop)":"")+'</td></tr>';
+ }).join("");
+ $("orfn").textContent=orfs.length?"Select a row to show that ORF in the translation.":"No ORFs of at least "+min+" amino acids. Try a lower minimum.";
+}
+function run(){
+ var r=clean($("in").value);seq=r.s;
+ $("warn").textContent=r.bad?r.bad+" character"+(r.bad>1?"s":"")+" other than A, C, G, T or U were ignored.":"";
+ if(!seq.length){$("out").hidden=true;$("warn").textContent="Enter a DNA sequence using A, C, G and T.";return}
+ var gc=(seq.match(/[GC]/g)||[]).length;
+ $("stats").innerHTML=[["Length",seq.length+" bp"],["GC content",(gc/seq.length*100).toFixed(1)+"%"],["Codons (+1)",Math.floor(seq.length/3)],["A / T / G / C",["A","T","G","C"].map(function(b){return (seq.split(b).length-1)}).join(" / ")]]
+  .map(function(x){return '<div class="stat"><b>'+x[1]+'</b><span>'+x[0]+'</span></div>'}).join("");
+ $("mrna").innerHTML=col(seq.replace(/T/g,"U"));
+ $("rc").innerHTML=col(rc(seq));
+ frame="+1";hl=null;$("out").hidden=false;render();renderOrfs();
+}
+function pick(i){
+ var o=orfs[i];if(!o)return;frame=o.f;hl=[o.ci0,o.ci1];render();
+ $("prot").scrollIntoView({behavior:"smooth",block:"center"});
+}
+$("go").onclick=run;
+$("ex").onclick=function(){$("in").value=EX;run()};
+$("clr").onclick=function(){$("in").value="";$("out").hidden=true;$("warn").textContent=""};
+$("min").oninput=function(){if(seq)renderOrfs()};
+$("orfs").onclick=function(e){var tr=e.target.closest("tr");if(tr)pick(+tr.dataset.i)};
+$("orfs").onkeydown=function(e){if(e.key==="Enter"||e.key===" "){var tr=e.target.closest("tr");if(tr){e.preventDefault();pick(+tr.dataset.i)}}};
+$("cp").onclick=function(){
+ var t=translate(frame).map(function(x){return x.a}).join("");
+ var done=function(m){$("cpm").textContent=m;setTimeout(function(){$("cpm").textContent=""},2000)};
+ try{navigator.clipboard.writeText(t).then(function(){done("Copied")},function(){done("Copy blocked: select the protein text instead")})}catch(e){done("Copy blocked: select the protein text instead")}
+};
+})();
+</script>
+</body>
+</html>
